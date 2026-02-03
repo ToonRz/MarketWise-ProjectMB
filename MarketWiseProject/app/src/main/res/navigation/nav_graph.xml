@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_dashboard">
+
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.marketwise.ui.dashboard.DashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/navigation_crypto"
+        android:name="com.marketwise.ui.crypto.CryptoDetailFragment"
+        android:label="Crypto Detail">
+        <argument
+            android:name="symbol"
+            app:argType="string" />
+        <argument
+            android:name="coinId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_stocks"
+        android:name="com.marketwise.ui.dashboard.DashboardFragment"
+        android:label="Stocks" />
+
+</navigation>
