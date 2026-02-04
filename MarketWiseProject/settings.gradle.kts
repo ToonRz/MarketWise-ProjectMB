@@ -2,7 +2,7 @@ pluginManagement {
     repositories {
         google()
         mavenCentral()
-        gradlePluginPortal() // <-- Add this line
+        gradlePluginPortal()
     }
 }
 
@@ -11,9 +11,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url = uri("https://jitpack.io") }
+        maven { url = uri("https://jitpack.io") } // ✅ สำหรับ MPAndroidChart
     }
 }
 
-rootProject.name = "MarketWise"
+rootProject.name = "MarketWiseProject"
 include(":app")
