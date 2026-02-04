@@ -5,9 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
     android:layout_marginVertical="8dp"
     app:cardBackgroundColor="@color/card_dark"
-    app:cardCornerRadius="12dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="4dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,63 +16,84 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Symbol -->
-        <TextView
-            android:id="@+id/symbolText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_white"
-            android:textSize="18sp"
-            android:textStyle="bold"
+        <!-- Crypto Icon -->
+        <ImageView
+            android:id="@+id/cryptoIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@mipmap/ic_launcher" 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="BTC/USDT" />
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <!-- Name -->
-        <TextView
-            android:id="@+id/nameText"
-            android:layout_width="wrap_content"
+        <!-- Symbol and Name -->
+        <LinearLayout
+            android:id="@+id/symbolLayout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/text_gray"
-            android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/symbolText"
-            tools:text="Bitcoin" />
-
-        <!-- Price -->
-        <TextView
-            android:id="@+id/priceText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical"
+            app:layout_constraintStart_toEndOf="@id/cryptoIcon"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="$43,250.50" />
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Change Percentage -->
-        <TextView
-            android:id="@+id/changeText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/priceText"
-            tools:text="+2.45%" />
+            <TextView
+                android:id="@+id/symbolText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="BTC/USDT" />
 
-        <!-- Mini Chart Placeholder -->
-        <View
+            <TextView
+                android:id="@+id/nameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_gray"
+                android:textSize="14sp"
+                tools:text="Bitcoin" />
+        </LinearLayout>
+
+        <!-- Mini Chart -->
+        <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/miniChart"
             android:layout_width="80dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="8dp"
-            android:background="@color/card_darker"
+            android:layout_height="40dp"
+            app:layout_constraintEnd_toStartOf="@id/priceLayout"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="16dp"/>
+
+        <!-- Price and Change -->
+        <LinearLayout
+            android:id="@+id/priceLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/changeText" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/priceText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="$43,250.50" />
+
+            <TextView
+                android:id="@+id/changeText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:textColor="@color/neon_green"
+                tools:text="+2.45%" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

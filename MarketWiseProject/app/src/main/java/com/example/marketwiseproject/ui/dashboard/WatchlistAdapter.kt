@@ -6,10 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.marketwiseproject.R
 import com.example.marketwiseproject.data.models.CryptoPrice
 import com.example.marketwiseproject.databinding.ItemWatchlistBinding
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import java.text.NumberFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class WatchlistAdapter(
     private val onItemClick: (CryptoPrice) -> Unit
@@ -36,27 +41,78 @@ class WatchlistAdapter(
 
         fun bind(crypto: CryptoPrice) {
             binding.apply {
+                // Set basic info
                 symbolText.text = crypto.symbol
                 nameText.text = crypto.name
                 priceText.text = currencyFormat.format(crypto.price)
 
+                // Set crypto icon (placeholder)
+                cryptoIcon.setImageResource(R.mipmap.ic_launcher)
+
+                // Set price change info
                 val changePercent = crypto.changePercent24h
                 val isPositive = changePercent >= 0
 
                 changeText.text = String.format(
                     "%s%.2f%%",
-                    if (isPositive) "↗️ +" else "↘️ ",
-                    changePercent
+                    if (isPositive) "↗️ " else "↘️ ",
+                    if (isPositive) changePercent else -changePercent
                 )
 
-                changeText.setTextColor(
-                    if (isPositive) Color.parseColor("#00FF41")
-                    else Color.parseColor("#FF0040")
-                )
+                val changeColor = if (isPositive) Color.parseColor("#00FF41") else Color.parseColor("#FF0040")
+                changeText.setTextColor(changeColor)
+
+                // Setup mini chart
+                setupMiniChart(isPositive, changeColor)
+
 
                 root.setOnClickListener {
                     onItemClick(crypto)
                 }
+            }
+        }
+
+        private fun setupMiniChart(isPositive: Boolean, chartColor: Int) {
+            binding.miniChart.apply {
+                // 1. Generate dummy data (replace with real data)
+                val entries = ArrayList<Entry>()
+                var lastVal = (20..50).random().toFloat()
+                entries.add(Entry(0f, lastVal))
+                for (i in 1..10) {
+                    lastVal += (-5..5).random().toFloat()
+                    if (lastVal < 0) lastVal = 0f
+                    entries.add(Entry(i.toFloat(), lastVal))
+                }
+                val finalVal = if(isPositive) lastVal + 5 else lastVal - 5
+                entries.add(Entry(11f, if(finalVal > 0) finalVal else 0f))
+
+                // 2. Create and style dataset
+                val dataSet = LineDataSet(entries, "Price trend")
+                dataSet.apply {
+                    color = chartColor
+                    lineWidth = 1.8f
+                    setDrawValues(false)
+                    setDrawCircles(false)
+                    mode = LineDataSet.Mode.CUBIC_BEZIER
+                    setDrawFilled(true)
+                    fillColor = chartColor
+                    fillAlpha = 40
+                }
+
+                // 3. Configure chart
+                data = LineData(dataSet)
+                description.isEnabled = false
+                legend.isEnabled = false
+                xAxis.isEnabled = false
+                axisLeft.isEnabled = false
+                axisRight.isEnabled = false
+                setTouchEnabled(false)
+                isDragEnabled = false
+                setScaleEnabled(false)
+                setDrawGridBackground(false)
+
+                // 4. Refresh chart
+                invalidate()
             }
         }
     }
