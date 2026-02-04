@@ -6,12 +6,12 @@
 
     <fragment
         android:id="@+id/navigation_dashboard"
-        android:name="com.marketwise.ui.dashboard.DashboardFragment"
+        android:name="com.example.marketwiseproject.ui.dashboard.DashboardFragment"
         android:label="Dashboard" />
 
     <fragment
         android:id="@+id/navigation_crypto"
-        android:name="com.marketwise.ui.crypto.CryptoDetailFragment"
+        android:name="com.example.marketwiseproject.ui.crypto.CryptoDetailFragment"
         android:label="Crypto Detail">
         <argument
             android:name="symbol"
@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/navigation_stocks"
-        android:name="com.marketwise.ui.dashboard.DashboardFragment"
+        android:name="com.example.marketwiseproject.ui.dashboard.DashboardFragment"
         android:label="Stocks" />
 
 </navigation>
