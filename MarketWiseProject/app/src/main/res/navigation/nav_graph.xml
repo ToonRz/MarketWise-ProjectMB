@@ -15,10 +15,12 @@
         android:label="Crypto Detail">
         <argument
             android:name="symbol"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue="btcusdt" />
         <argument
             android:name="coinId"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue="bitcoin" />
     </fragment>
 
     <fragment

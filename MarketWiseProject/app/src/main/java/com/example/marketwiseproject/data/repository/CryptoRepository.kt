@@ -15,6 +15,7 @@ class CryptoRepository {
             val markets = coinGeckoApi.getMarkets(perPage = 50)
             markets.map { market ->
                 CryptoPrice(
+                    id = market.id,
                     symbol = market.symbol.uppercase(),
                     name = market.name,
                     price = market.current_price,
