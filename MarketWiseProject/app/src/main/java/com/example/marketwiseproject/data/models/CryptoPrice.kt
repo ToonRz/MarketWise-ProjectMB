@@ -1,6 +1,7 @@
 package com.example.marketwiseproject.data.models
 
 data class CryptoPrice(
+    val id: String,
     val symbol: String,
     val name: String,
     val price: Double,
