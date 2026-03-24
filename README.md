@@ -71,6 +71,10 @@ MarketWiseProject/
 - `POST_NOTIFICATIONS`
 - `WAKE_LOCK`
 
+## Wireframe
+
+- See low-fidelity wireframe: [`WIREFRAME.md`](WIREFRAME.md)
+
 ## Notes
 
 - If `FINNHUB_API_KEY` is missing, stock API requests may fail or return empty/error results.
