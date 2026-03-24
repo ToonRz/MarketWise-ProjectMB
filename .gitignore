@@ -1,0 +1,23 @@
+# IDE
+.idea/
+*.iml
+
+# Android/Gradle
+**/build/
+.gradle/
+local.properties
+
+# OS files
+.DS_Store
+
+# Generated / binaries
+*.apk
+*.aab
+*.ap_
+*.keystore
+*.jks
+
+# Env/secrets
+.env
+.env.*
+*.log
