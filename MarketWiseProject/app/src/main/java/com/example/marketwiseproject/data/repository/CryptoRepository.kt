@@ -5,10 +5,10 @@ import com.example.marketwiseproject.data.api.CoinGeckoApi
 import com.example.marketwiseproject.data.models.CryptoPrice
 import kotlinx.coroutines.flow.Flow
 
-class CryptoRepository {
-
-    private val coinGeckoApi = CoinGeckoApi.create()
-    private val binanceWebSocket = BinanceWebSocket()
+class CryptoRepository(
+    private val coinGeckoApi: CoinGeckoApi = CoinGeckoApi.create(),
+    private val binanceWebSocket: BinanceWebSocket = BinanceWebSocket()
+) {
 
     suspend fun getTopCryptos(): List<CryptoPrice> {
         return try {
