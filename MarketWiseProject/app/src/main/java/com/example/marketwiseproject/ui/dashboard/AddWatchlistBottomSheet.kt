@@ -13,7 +13,7 @@ import com.example.marketwiseproject.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 
-class AddWatchlistBottomSheet(private val onCoinSelected: (String, String) -> Unit) : BottomSheetDialogFragment() {
+class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, String) -> Unit) : BottomSheetDialogFragment() {
 
     // Simple mock data for presentation
     private val availableCoins = listOf(
@@ -44,8 +44,8 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String) -> Un
         val recyclerView = view.findViewById<RecyclerView>(R.id.searchRecyclerView)
         val searchInput = view.findViewById<TextInputEditText>(R.id.searchInput)
 
-        searchAdapter = SearchAdapter(filteredCoins) { coinId, symbol ->
-            onCoinSelected(coinId, symbol)
+        searchAdapter = SearchAdapter(filteredCoins) { coinId, symbol, name ->
+            onCoinSelected(coinId, symbol, name)
             dismiss()
         }
 
@@ -71,7 +71,7 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String) -> Un
 
     private inner class SearchAdapter(
         private var items: List<Pair<String, String>>,
-        private val onItemClick: (String, String) -> Unit
+        private val onItemClick: (String, String, String) -> Unit
     ) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -82,7 +82,7 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String) -> Un
                 view.setOnClickListener {
                     val item = items[adapterPosition]
                     val parts = item.second.split(" - ")
-                    onItemClick(item.first, parts[0])
+                    onItemClick(item.first, parts[0], parts[1])
                 }
             }
         }

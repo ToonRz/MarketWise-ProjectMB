@@ -60,17 +60,17 @@ class DashboardFragment : Fragment() {
             scaleDown.start()
 
             // Open BottomSheet
-            val bottomSheet = AddWatchlistBottomSheet { coinId, symbol ->
-                addCoinToDatabase(coinId, symbol)
+            val bottomSheet = AddWatchlistBottomSheet { coinId, symbol, name ->
+                addCoinToDatabase(symbol, name)
             }
             bottomSheet.show(parentFragmentManager, "AddWatchlistBottomSheet")
         }
     }
 
-    private fun addCoinToDatabase(coinId: String, symbol: String) {
+    private fun addCoinToDatabase(symbol: String, name: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val dao = AppDatabase.getDatabase(requireContext()).watchlistDao()
-            dao.insert(WatchlistEntity(id = coinId, symbol = symbol, addedAt = System.currentTimeMillis()))
+            dao.insert(WatchlistEntity(symbol = symbol, name = name, type = "CRYPTO", addedAt = System.currentTimeMillis()))
             
             withContext(Dispatchers.Main) {
                 Toast.makeText(requireContext(), "$symbol added to Watchlist!", Toast.LENGTH_SHORT).show()
