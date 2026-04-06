@@ -13,6 +13,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.marketwiseproject.databinding.FragmentDashboardBinding
 import java.util.Locale
 import kotlinx.coroutines.launch
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
+import android.view.animation.DecelerateInterpolator
+import androidx.lifecycle.lifecycleScope
+import com.example.marketwiseproject.data.db.AppDatabase
+import com.example.marketwiseproject.data.db.WatchlistEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import android.widget.Toast
 
 class DashboardFragment : Fragment() {
 
@@ -38,8 +47,36 @@ class DashboardFragment : Fragment() {
         setupObservers()
         setupSwipeRefresh()
 
-        binding.fabAdd.setOnClickListener {
-            // TODO: Show dialog to add new item to watchlist
+        binding.fabAdd.setOnClickListener { view ->
+            // Scale Animation for Gimmick
+            val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
+                view,
+                PropertyValuesHolder.ofFloat("scaleX", 0.9f),
+                PropertyValuesHolder.ofFloat("scaleY", 0.9f)
+            )
+            scaleDown.duration = 100
+            scaleDown.repeatCount = 1
+            scaleDown.repeatMode = ObjectAnimator.REVERSE
+            scaleDown.start()
+
+            // Open BottomSheet
+            val bottomSheet = AddWatchlistBottomSheet { coinId, symbol ->
+                addCoinToDatabase(coinId, symbol)
+            }
+            bottomSheet.show(parentFragmentManager, "AddWatchlistBottomSheet")
+        }
+    }
+
+    private fun addCoinToDatabase(coinId: String, symbol: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val dao = AppDatabase.getDatabase(requireContext()).watchlistDao()
+            dao.insert(WatchlistEntity(id = coinId, symbol = symbol, addedAt = System.currentTimeMillis()))
+            
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "$symbol added to Watchlist!", Toast.LENGTH_SHORT).show()
+                // Refresh data
+                viewModel.loadWatchlistPrices()
+            }
         }
     }
 
@@ -77,7 +114,11 @@ class DashboardFragment : Fragment() {
                 else -> "$index - Extreme Greed"
             }
 
-            binding.fearGreedProgress.progress = index
+            // Gimmick: Animate Progress Bar exactly to the value
+            val progressAnimator = ObjectAnimator.ofInt(binding.fearGreedProgress, "progress", 0, index)
+            progressAnimator.duration = 1500 // 1.5 seconds animation
+            progressAnimator.interpolator = DecelerateInterpolator()
+            progressAnimator.start()
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
