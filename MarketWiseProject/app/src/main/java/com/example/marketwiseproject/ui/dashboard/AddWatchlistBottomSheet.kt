@@ -80,9 +80,12 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, Strin
 
             init {
                 view.setOnClickListener {
-                    val item = items[adapterPosition]
-                    val parts = item.second.split(" - ")
-                    onItemClick(item.first, parts[0], parts[1])
+                    val position = bindingAdapterPosition
+                    if (position != RecyclerView.NO_POSITION) {
+                        val item = items[position]
+                        val parts = item.second.split(" - ")
+                        onItemClick(item.first, parts[0], parts[1])
+                    }
                 }
             }
         }
