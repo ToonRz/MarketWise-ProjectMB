@@ -46,8 +46,10 @@ data class CoinGeckoMarket(
     val high_24h: Double,
     val low_24h: Double,
     val total_volume: Double,
-    val market_cap: Double
+    val market_cap: Double,
+    val image: String? = null
 )
+
 
 data class MarketChartResponse(
     val prices: List<List<Double>>  // ✅ [[timestamp, price], ...]

@@ -17,6 +17,7 @@ class CryptoViewModel : ViewModel() {
 
     private val repository = CryptoRepository()
 
+    // For detail screen
     private val _currentPrice = MutableStateFlow(0.0)
     val currentPrice: StateFlow<Double> = _currentPrice
 
@@ -28,6 +29,27 @@ class CryptoViewModel : ViewModel() {
 
     private val _historicalPrices = MutableLiveData<List<Double>>()
     val historicalPrices: LiveData<List<Double>> = _historicalPrices
+
+    // For list screen
+    private val _cryptoList = MutableStateFlow<List<CryptoPrice>>(emptyList())
+    val cryptoList: StateFlow<List<CryptoPrice>> = _cryptoList
+
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    fun loadCryptoList() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val prices = repository.getTopCryptos()
+                _cryptoList.value = prices
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 
     fun startRealtimeUpdates(symbol: String) {
         viewModelScope.launch {

@@ -11,8 +11,10 @@ data class CryptoPrice(
     val low24h: Double,
     val volume24h: Double,
     val marketCap: Double,
+    val image: String? = null,
     val lastUpdate: Long = System.currentTimeMillis()
 )
+
 
 data class PriceUpdate(
     val symbol: String,

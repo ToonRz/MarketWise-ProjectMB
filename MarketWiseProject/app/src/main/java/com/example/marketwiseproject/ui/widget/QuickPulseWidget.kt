@@ -4,8 +4,12 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import androidx.work.*
 import com.example.marketwiseproject.R
+import com.example.marketwiseproject.data.models.CryptoPrice
+import java.text.NumberFormat
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class QuickPulseWidget : AppWidgetProvider() {
@@ -15,7 +19,7 @@ class QuickPulseWidget : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        // Schedule periodic updates
+        // 1. Schedule periodic updates
         val workRequest = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(
             15, TimeUnit.MINUTES
         ).build()
@@ -26,26 +30,56 @@ class QuickPulseWidget : AppWidgetProvider() {
             workRequest
         )
 
-        // Update all widgets
+        // 2. Trigger an immediate update (OneTimeWorkRequest)
+        val immediateRequest = OneTimeWorkRequestBuilder<WidgetUpdateWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .build()
+        WorkManager.getInstance(context).enqueue(immediateRequest)
+
+        // 3. Update all widgets with loading state initially
         for (appWidgetId in appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, appWidgetId)
+            updateAppWidget(context, appWidgetManager, appWidgetId, null)
         }
     }
 
     companion object {
+        private val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
+
         fun updateAppWidget(
             context: Context,
             appWidgetManager: AppWidgetManager,
-            appWidgetId: Int
+            appWidgetId: Int,
+            crypto: CryptoPrice?
         ) {
             val views = RemoteViews(context.packageName, R.layout.widget_quick_pulse)
 
-            // Update widget views
-            views.setTextViewText(R.id.widget_symbol, "BTC/USDT")
-            views.setTextViewText(R.id.widget_price, "$43,250.50")
-            views.setTextViewText(R.id.widget_change, "↗️ +2.4%")
-            views.setTextViewText(R.id.widget_update_time, "Updated: ${getCurrentTime()}")
+            if (crypto != null) {
+                // Update widget with real data
+                views.setTextViewText(R.id.widget_symbol, "${crypto.symbol}/USDT")
+                views.setTextViewText(R.id.widget_price, currencyFormat.format(crypto.price))
 
+                val isPositive = crypto.changePercent24h >= 0
+                val changeText = String.format(
+                    "%s%.2f%%",
+                    if (isPositive) "+" else "",
+                    crypto.changePercent24h
+                )
+                views.setTextViewText(R.id.widget_change, changeText)
+                views.setTextColor(
+                    R.id.widget_change,
+                    ContextCompat.getColor(
+                        context,
+                        if (isPositive) R.color.positive_muted else R.color.negative_muted
+                    )
+                )
+            } else {
+                // Loading state
+                views.setTextViewText(R.id.widget_symbol, "Loading...")
+                views.setTextViewText(R.id.widget_price, "---")
+                views.setTextViewText(R.id.widget_change, "...")
+            }
+
+            views.setTextViewText(R.id.widget_update_time, "Updated: ${getCurrentTime()}")
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
 

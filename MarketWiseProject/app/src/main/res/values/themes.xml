@@ -1,22 +1,58 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.MarketWise" parent="Theme.MaterialComponents.DayNight">
-        <!-- Remove the default action bar to use a custom Toolbar -->
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-
+    <!-- Updated Base application theme: Warm Minimal Light Theme -->
+    <style name="Theme.MarketWise" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/neon_cyan</item>
-        <item name="colorPrimaryVariant">@color/deep_black</item>
+        <item name="colorPrimary">@color/warm_primary</item>
+        <item name="colorPrimaryVariant">@color/warm_primary</item>
         <item name="colorOnPrimary">@color/white</item>
+        
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/neon_green</item>
-        <item name="colorSecondaryVariant">@color/neon_purple</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/positive_muted</item>
+        <item name="colorSecondaryVariant">@color/positive_muted</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">@color/deep_black</item>
-        <!-- Customize your theme here. -->
-        <item name="android:windowBackground">@color/deep_black</item>
-        <item name="android:textColor">@color/text_white</item>
+        <item name="android:statusBarColor">@color/warm_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        
+        <!-- Window Background -->
+        <item name="android:windowBackground">@color/warm_bg</item>
+        
+        <!-- Text Styling -->
+        <item name="android:textColor">@color/warm_text</item>
+        
+        <!-- Button & Box Styles -->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.MarketWise.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.MarketWise.Medium</item>
+    </style>
+
+    <style name="ShapeAppearance.MarketWise.Small" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="ShapeAppearance.MarketWise.Medium" parent="ShapeAppearance.MaterialComponents.MediumComponent">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <!-- Key Stats Styles for Details -->
+    <style name="KeyStatLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">@color/text_gray_warm</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="KeyStatValue">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">@color/warm_text</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+
+        <item name="android:gravity">end</item>
     </style>
 </resources>

@@ -97,6 +97,8 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.cardview)
     implementation(libs.androidx.swiperefreshlayout)
+    implementation(libs.coil)
+
 
     // Testing
     testImplementation(libs.junit)

@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import coil.load
+import coil.transform.CircleCropTransformation
 import com.example.marketwiseproject.R
 import com.example.marketwiseproject.data.api.FinnhubApi
 import com.example.marketwiseproject.data.models.StockDetails
@@ -44,23 +46,36 @@ class StockDetailFragment : Fragment() {
         val viewModelFactory = StockDetailViewModelFactory(stockRepository)
         viewModel = ViewModelProvider(this, viewModelFactory)[StockDetailViewModel::class.java]
 
-        val symbol = arguments?.getString("symbol") ?: "AAPL" // Default to AAPL if no symbol is passed
+        val symbol = arguments?.getString("symbol") ?: "AAPL"
 
         observeViewModel()
+        
+        binding.btnRetry.setOnClickListener {
+            viewModel.fetchStockDetails(symbol)
+        }
+
         viewModel.fetchStockDetails(symbol)
     }
 
     private fun observeViewModel() {
-        viewModel.stockDetailState.observe(viewLifecycleOwner) {
-            when (it) {
+        viewModel.stockDetailState.observe(viewLifecycleOwner) { state ->
+            when (state) {
                 is StockDetailState.Loading -> {
-                    // Show loading indicator
+                    binding.loadingProgress.visibility = View.VISIBLE
+                    binding.stockDetailContent.visibility = View.GONE
+                    binding.errorLayout.visibility = View.GONE
                 }
                 is StockDetailState.Success -> {
-                    updateUi(it.data)
+                    binding.loadingProgress.visibility = View.GONE
+                    binding.stockDetailContent.visibility = View.VISIBLE
+                    binding.errorLayout.visibility = View.GONE
+                    updateUi(state.data)
                 }
                 is StockDetailState.Error -> {
-                    // Show error message
+                    binding.loadingProgress.visibility = View.GONE
+                    binding.stockDetailContent.visibility = View.GONE
+                    binding.errorLayout.visibility = View.VISIBLE
+                    binding.errorText.text = state.message
                 }
             }
         }
@@ -81,7 +96,7 @@ class StockDetailFragment : Fragment() {
                 details.percentChange
             )
             stockChange.text = changeTextFormatted
-            stockChange.setTextColor(ContextCompat.getColor(requireContext(), if (isPositive) R.color.neon_green else R.color.neon_red))
+            stockChange.setTextColor(ContextCompat.getColor(requireContext(), if (isPositive) R.color.positive_muted else R.color.negative_muted))
 
             // Key Stats
             statOpen.text = currencyFormat.format(details.openPrice)
@@ -93,11 +108,16 @@ class StockDetailFragment : Fragment() {
             statPeRatio.text = details.peRatio?.let { String.format("%.2fx", it) } ?: "N/A"
             statSharesOutstanding.text = formatLargeNumber(details.sharesOutstanding)
 
+            // Logo with Coil
+            companyLogo.load(details.logoUrl) {
+                crossfade(true)
+                placeholder(R.mipmap.ic_launcher)
+                error(R.mipmap.ic_launcher)
+                transformations(CircleCropTransformation())
+            }
+
             // Chart
             setupPriceChart(details)
-
-            // Placeholder for logo
-            companyLogo.setImageResource(R.mipmap.ic_launcher)
         }
     }
 
@@ -107,8 +127,10 @@ class StockDetailFragment : Fragment() {
             entries.add(Entry(index.toFloat(), price.toFloat()))
         }
 
+        if (entries.isEmpty()) return
+
         val isPositive = details.change >= 0
-        val chartColor = ContextCompat.getColor(requireContext(), if (isPositive) R.color.neon_green else R.color.neon_red)
+        val chartColor = ContextCompat.getColor(requireContext(), if (isPositive) R.color.positive_muted else R.color.negative_muted)
 
         val dataSet = LineDataSet(entries, "Stock Price").apply {
             color = chartColor
@@ -126,7 +148,10 @@ class StockDetailFragment : Fragment() {
             description.isEnabled = false
             legend.isEnabled = false
             xAxis.isEnabled = false
-            axisLeft.textColor = Color.WHITE
+            axisLeft.apply {
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_gray_warm)
+                gridColor = Color.parseColor("#E9E5D9")
+            }
             axisRight.isEnabled = false
             setTouchEnabled(true)
             isDragEnabled = true

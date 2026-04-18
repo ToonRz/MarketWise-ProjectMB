@@ -1,4 +1,4 @@
-package com.example.marketwiseproject.ui.dashboard
+package com.example.marketwiseproject.ui.stock
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,17 +9,17 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.example.marketwiseproject.R
-import com.example.marketwiseproject.data.models.CryptoPrice
-import com.example.marketwiseproject.databinding.ItemWatchlistBinding
+import com.example.marketwiseproject.data.models.StockQuote
+import com.example.marketwiseproject.databinding.ItemStockBinding
 import java.text.NumberFormat
 import java.util.Locale
 
-class WatchlistAdapter(
-    private val onItemClick: (CryptoPrice) -> Unit
-) : ListAdapter<CryptoPrice, WatchlistAdapter.ViewHolder>(DiffCallback()) {
+class StockListAdapter(
+    private val onItemClick: (StockQuote) -> Unit
+) : ListAdapter<StockQuote, StockListAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ItemWatchlistBinding.inflate(
+        val binding = ItemStockBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -32,25 +32,25 @@ class WatchlistAdapter(
     }
 
     inner class ViewHolder(
-        private val binding: ItemWatchlistBinding
+        private val binding: ItemStockBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
-        fun bind(crypto: CryptoPrice) {
+        fun bind(stock: StockQuote) {
             binding.apply {
-                cryptoSymbol.text = crypto.symbol
-                cryptoName.text = crypto.name
-                cryptoPrice.text = currencyFormat.format(crypto.price)
+                stockSymbol.text = stock.symbol
+                stockName.text = stock.name
+                stockPrice.text = currencyFormat.format(stock.currentPrice)
 
-                val isPositive = crypto.changePercent24h >= 0
+                val isPositive = stock.percentChange >= 0
                 val changeText = String.format(
                     "%s%.2f%%",
                     if (isPositive) "+" else "",
-                    crypto.changePercent24h
+                    stock.percentChange
                 )
-                cryptoChange.text = changeText
-                cryptoChange.setTextColor(
+                stockChange.text = changeText
+                stockChange.setTextColor(
                     ContextCompat.getColor(
                         root.context,
                         if (isPositive) R.color.positive_muted else R.color.negative_muted
@@ -58,26 +58,26 @@ class WatchlistAdapter(
                 )
 
                 // Load Logo using Coil
-                cryptoIcon.load(crypto.image) {
+                stockIcon.load(stock.logoUrl) {
                     crossfade(true)
-                    placeholder(R.mipmap.ic_launcher) // Fallback placeholder
+                    placeholder(R.mipmap.ic_launcher)
                     error(R.mipmap.ic_launcher)
                     transformations(CircleCropTransformation())
                 }
 
                 root.setOnClickListener {
-                    onItemClick(crypto)
+                    onItemClick(stock)
                 }
             }
         }
     }
 
-    private class DiffCallback : DiffUtil.ItemCallback<CryptoPrice>() {
-        override fun areItemsTheSame(oldItem: CryptoPrice, newItem: CryptoPrice): Boolean {
-            return oldItem.id == newItem.id
+    private class DiffCallback : DiffUtil.ItemCallback<StockQuote>() {
+        override fun areItemsTheSame(oldItem: StockQuote, newItem: StockQuote): Boolean {
+            return oldItem.symbol == newItem.symbol
         }
 
-        override fun areContentsTheSame(oldItem: CryptoPrice, newItem: CryptoPrice): Boolean {
+        override fun areContentsTheSame(oldItem: StockQuote, newItem: StockQuote): Boolean {
             return oldItem == newItem
         }
     }

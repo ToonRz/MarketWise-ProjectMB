@@ -29,18 +29,18 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/cryptoIcon"
+                android:id="@+id/stockIcon"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:layout_gravity="center"
-                android:contentDescription="Asset Logo"
+                android:contentDescription="Stock Logo"
                 android:scaleType="centerInside"
-                tools:src="@android:drawable/ic_dialog_info" />
+                tools:src="@android:drawable/ic_menu_sort_by_size" />
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Asset Symbol & Name -->
+        <!-- Stock Symbol & Name -->
         <TextView
-            android:id="@+id/cryptoSymbol"
+            android:id="@+id/stockSymbol"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -49,21 +49,25 @@
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/logo_container"
             app:layout_constraintTop_toTopOf="@id/logo_container"
-            tools:text="BTC" />
+            tools:text="AAPL" />
 
         <TextView
-            android:id="@+id/cryptoName"
-            android:layout_width="wrap_content"
+            android:id="@+id/stockName"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/text_gray_warm"
             android:textSize="12sp"
-            app:layout_constraintStart_toStartOf="@id/cryptoSymbol"
-            app:layout_constraintTop_toBottomOf="@id/cryptoSymbol"
-            tools:text="Bitcoin" />
+            app:layout_constraintEnd_toStartOf="@id/stockPrice"
+            app:layout_constraintStart_toStartOf="@id/stockSymbol"
+            app:layout_constraintTop_toBottomOf="@id/stockSymbol"
+            tools:text="Apple Inc." />
 
         <!-- Price & Change -->
         <TextView
-            android:id="@+id/cryptoPrice"
+            android:id="@+id/stockPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/warm_text"
@@ -71,18 +75,18 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/logo_container"
-            tools:text="$65,240.50" />
+            tools:text="$175.50" />
 
         <TextView
-            android:id="@+id/cryptoChange"
+            android:id="@+id/stockChange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:textSize="13sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cryptoPrice"
-            tools:text="+2.45%"
+            app:layout_constraintTop_toBottomOf="@id/stockPrice"
+            tools:text="+1.25%"
             tools:textColor="@color/positive_muted" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

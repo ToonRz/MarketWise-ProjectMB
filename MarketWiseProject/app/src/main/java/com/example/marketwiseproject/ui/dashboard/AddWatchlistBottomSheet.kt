@@ -6,12 +6,12 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.marketwiseproject.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.textfield.TextInputEditText
 
 class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, String) -> Unit) : BottomSheetDialogFragment() {
 
@@ -41,8 +41,8 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, Strin
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.searchRecyclerView)
-        val searchInput = view.findViewById<TextInputEditText>(R.id.searchInput)
+        val recyclerView = view.findViewById<RecyclerView>(R.id.search_results_rv)
+        val searchInput = view.findViewById<EditText>(R.id.search_edit_text)
 
         searchAdapter = SearchAdapter(filteredCoins) { coinId, symbol, name ->
             onCoinSelected(coinId, symbol, name)
@@ -75,8 +75,8 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, Strin
     ) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
         inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-            val nameText: TextView = view.findViewById(R.id.coinName)
-            val symbolText: TextView = view.findViewById(R.id.coinSymbol)
+            val nameText: TextView = view.findViewById(R.id.cryptoName)
+            val symbolText: TextView = view.findViewById(R.id.cryptoSymbol)
 
             init {
                 view.setOnClickListener {

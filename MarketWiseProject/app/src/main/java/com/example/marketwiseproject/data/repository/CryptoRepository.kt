@@ -24,8 +24,10 @@ class CryptoRepository(
                     high24h = market.high_24h,
                     low24h = market.low_24h,
                     volume24h = market.total_volume,
-                    marketCap = market.market_cap
+                    marketCap = market.market_cap,
+                    image = market.image
                 )
+
             }
         } catch (e: Exception) {
             e.printStackTrace()

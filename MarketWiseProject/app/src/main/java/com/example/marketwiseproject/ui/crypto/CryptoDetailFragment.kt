@@ -5,19 +5,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import coil.load
+import coil.transform.CircleCropTransformation
+import com.example.marketwiseproject.R
+import com.example.marketwiseproject.databinding.FragmentCryptoDetailBinding
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.example.marketwiseproject.R  // ✅ เพิ่มบรรทัดนี้
-import com.example.marketwiseproject.data.models.TradingSignal
-import com.example.marketwiseproject.databinding.FragmentCryptoDetailBinding
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
-import java.util.*
+import java.util.Locale
 
 class CryptoDetailFragment : Fragment() {
 
@@ -59,24 +62,64 @@ class CryptoDetailFragment : Fragment() {
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
-                textColor = Color.WHITE
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_gray_warm)
             }
 
             axisLeft.apply {
                 setDrawGridLines(true)
-                gridColor = Color.parseColor("#1A1F3A")
-                textColor = Color.WHITE
+                gridColor = Color.parseColor("#E9E5D9")
+                textColor = ContextCompat.getColor(requireContext(), R.color.text_gray_warm)
             }
 
             axisRight.isEnabled = false
-            legend.textColor = Color.WHITE
+            legend.isEnabled = false
         }
     }
 
     private fun setupObservers() {
+        // Observe current price and historical data to update price/change
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.currentPrice.collect { price ->
-                binding.currentPrice.text = currencyFormat.format(price)
+                binding.cryptoPrice.text = currencyFormat.format(price)
+                
+                // Also update the change based on historical data if available
+                val hist = viewModel.historicalPrices.value
+                if (hist != null && hist.isNotEmpty()) {
+                    val firstPrice = hist.first()
+                    val change = price - firstPrice
+                    val percent = (change / firstPrice) * 100
+                    
+                    val isPositive = change >= 0
+                    binding.cryptoChange.text = String.format(
+                        "%s%s (%.2f%%)",
+                        if (isPositive) "+" else "",
+                        currencyFormat.format(change),
+                        percent
+                    )
+                    binding.cryptoChange.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            if (isPositive) R.color.positive_muted else R.color.negative_muted
+                        )
+                    )
+                }
+            }
+        }
+
+        viewModel.cryptoData.observe(viewLifecycleOwner) { crypto ->
+            binding.cryptoSymbol.text = crypto.symbol
+            binding.cryptoName.text = crypto.name
+            
+            // Stats
+            binding.statMarketCap.text = formatLargeNumber(crypto.marketCap)
+            binding.statVolume.text = formatLargeNumber(crypto.volume24h)
+            binding.statHigh.text = currencyFormat.format(crypto.high24h)
+            binding.statLow.text = currencyFormat.format(crypto.low24h)
+            
+            // Logo
+            binding.cryptoLogo.load(crypto.image) {
+                crossfade(true)
+                transformations(CircleCropTransformation())
             }
         }
 
@@ -85,10 +128,6 @@ class CryptoDetailFragment : Fragment() {
                 updateChart(prices)
             }
         }
-
-        viewModel.technicalIndicator.observe(viewLifecycleOwner) { indicator ->
-            updateIndicators(indicator)
-        }
     }
 
     private fun updateChart(prices: List<Double>) {
@@ -96,14 +135,20 @@ class CryptoDetailFragment : Fragment() {
             Entry(index.toFloat(), price.toFloat())
         }
 
+        val isPositive = if (prices.size >= 2) prices.last() >= prices.first() else true
+        val chartColor = ContextCompat.getColor(
+            requireContext(),
+            if (isPositive) R.color.positive_muted else R.color.negative_muted
+        )
+
         val dataSet = LineDataSet(entries, "Price").apply {
-            color = Color.parseColor("#00D9FF")
+            color = chartColor
             lineWidth = 2f
             setDrawCircles(false)
             setDrawValues(false)
             mode = LineDataSet.Mode.CUBIC_BEZIER
-            fillColor = Color.parseColor("#00D9FF")
-            fillAlpha = 50
+            fillColor = chartColor
+            fillAlpha = 40
             setDrawFilled(true)
         }
 
@@ -111,55 +156,12 @@ class CryptoDetailFragment : Fragment() {
         binding.priceChart.invalidate()
     }
 
-    private fun updateIndicators(indicator: com.example.marketwiseproject.data.models.TechnicalIndicator) {
-        binding.apply {
-            // RSI
-            rsiValue.text = String.format("%.2f", indicator.rsi)
-            rsiSignal.text = when {
-                indicator.rsi < 30 -> "OVERSOLD"
-                indicator.rsi > 70 -> "OVERBOUGHT"
-                else -> "NEUTRAL"
-            }
-            rsiSignal.setTextColor(when {
-                indicator.rsi < 30 -> Color.parseColor("#00FF41")
-                indicator.rsi > 70 -> Color.parseColor("#FF0040")
-                else -> Color.parseColor("#8B93A7")
-            })
-
-            // MACD
-            macdValue.text = String.format("%.2f", indicator.macd)
-            macdSignal.text = if (indicator.macd > indicator.macdSignal) "BUY" else "SELL"
-            macdSignal.setTextColor(
-                if (indicator.macd > indicator.macdSignal) Color.parseColor("#00FF41")
-                else Color.parseColor("#FF0040")
-            )
-
-            // Moving Averages
-            maValue.text = String.format(
-                "$%.0f / $%.0f",
-                indicator.ma50,
-                indicator.ma200
-            )
-
-            // Overall Signal
-            updateSignalCard(indicator.signal)
-        }
-    }
-
-    private fun updateSignalCard(signal: TradingSignal) {
-        binding.apply {
-            signalText.text = signal.name.replace("_", " ")
-
-            val (backgroundColor, textColor) = when (signal) {
-                TradingSignal.STRONG_BUY -> Pair("#00FF41", "#0A0E27")
-                TradingSignal.BUY -> Pair("#00D9FF", "#0A0E27")
-                TradingSignal.NEUTRAL -> Pair("#8B93A7", "#FFFFFF")
-                TradingSignal.SELL -> Pair("#FF9500", "#0A0E27")
-                TradingSignal.STRONG_SELL -> Pair("#FF0040", "#FFFFFF")
-            }
-
-            signalCard.setCardBackgroundColor(Color.parseColor(backgroundColor))
-            signalText.setTextColor(Color.parseColor(textColor))
+    private fun formatLargeNumber(number: Double): String {
+        return when {
+            number >= 1_000_000_000_000 -> String.format("%.2fT", number / 1_000_000_000_000)
+            number >= 1_000_000_000 -> String.format("%.2fB", number / 1_000_000_000)
+            number >= 1_000_000 -> String.format("%.2fM", number / 1_000_000)
+            else -> NumberFormat.getNumberInstance(Locale.US).format(number)
         }
     }
 

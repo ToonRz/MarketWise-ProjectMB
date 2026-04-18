@@ -1,148 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/deep_black">
+    android:background="@color/warm_bg">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
+        android:id="@+id/stockDetailContent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        android:visibility="gone"
+        tools:visibility="visible">
 
-        <!-- Header: Symbol, Name, Price, Change -->
-        <ImageView
-            android:id="@+id/company_logo"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@mipmap/ic_launcher" 
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/stock_symbol"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:textColor="@color/text_white"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/company_logo"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="AAPL" />
+            android:padding="20dp">
 
-        <TextView
-            android:id="@+id/stock_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_gray"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@id/stock_symbol"
-            app:layout_constraintTop_toBottomOf="@id/stock_symbol"
-            tools:text="Apple Inc."/>
+            <!-- Logo -->
+            <ImageView
+                android:id="@+id/company_logo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@android:drawable/ic_dialog_info" />
 
-        <TextView
-            android:id="@+id/stock_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/text_white"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="$175.50" />
+            <TextView
+                android:id="@+id/stock_symbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textColor="@color/warm_text"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/company_logo"
+                app:layout_constraintTop_toTopOf="@id/company_logo"
+                tools:text="AAPL" />
 
-        <TextView
-            android:id="@+id/stock_change"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/stock_price"
-            tools:text="-$2.45 (-1.38%)" />
+            <TextView
+                android:id="@+id/stock_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_gray_warm"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@id/stock_symbol"
+                app:layout_constraintTop_toBottomOf="@id/stock_symbol"
+                tools:text="Apple Inc." />
 
-        <!-- Chart -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/chart_card"
-            android:layout_width="0dp"
-            android:layout_height="300dp"
-            android:layout_marginTop="24dp"
-            app:cardBackgroundColor="@color/card_dark"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            app:layout_constraintTop_toBottomOf="@id/stock_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            <!-- Price & Change -->
+            <TextView
+                android:id="@+id/stock_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:textColor="@color/warm_text"
+                android:textSize="36sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/company_logo"
+                tools:text="$175.50" />
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/price_chart"
+            <TextView
+                android:id="@+id/stock_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/stock_price"
+                tools:text="-$2.45 (-1.38%)"
+                tools:textColor="@color/negative_muted" />
+
+            <!-- Chart -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chart_card"
+                android:layout_width="0dp"
+                android:layout_height="280dp"
+                android:layout_marginTop="24dp"
+                app:cardBackgroundColor="@color/warm_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/stock_change">
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/price_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="12dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Key Stats Title -->
+            <TextView
+                android:id="@+id/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Key Statistics"
+                android:textColor="@color/warm_text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chart_card" />
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="8dp"/>
-        </com.google.android.material.card.MaterialCardView>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/warm_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/stats_title">
 
-        <!-- Key Stats -->
+                <GridLayout
+                    android:id="@+id/key_stats_grid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="12dp"
+                    android:columnCount="2">
+
+                    <TextView android:text="Open" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_open" style="@style/KeyStatValue" tools:text="$177.20" />
+
+                    <TextView android:text="High" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_high" style="@style/KeyStatValue" tools:text="$178.49" />
+
+                    <TextView android:text="Low" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_low" style="@style/KeyStatValue" tools:text="$175.11" />
+
+                    <TextView android:text="Prev. Close" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_prev_close" style="@style/KeyStatValue" tools:text="$177.95" />
+
+                    <TextView android:text="Market Cap" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_market_cap" style="@style/KeyStatValue" tools:text="$2.75T" />
+
+                    <TextView android:text="Volume" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_volume" style="@style/KeyStatValue" tools:text="58.6M" />
+
+                    <TextView android:text="P/E Ratio" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_pe_ratio" style="@style/KeyStatValue" tools:text="29.8x" />
+
+                    <TextView android:text="Shares Out." style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_shares_outstanding" style="@style/KeyStatValue" tools:text="15.5B" />
+                </GridLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <!-- State Overlay Views -->
+    <ProgressBar
+        android:id="@+id/loadingProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/errorLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
         <TextView
-            android:id="@+id/key_stats_title"
+            android:id="@+id/errorText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Key Statistics"
-            android:textColor="@color/text_white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/chart_card" />
+            android:text="Failed to load stock data"
+            android:textColor="@color/negative_muted"
+            android:textSize="16sp" />
 
-        <GridLayout
-            android:id="@+id/key_stats_grid"
-            android:layout_width="0dp"
+        <Button
+            android:id="@+id/btnRetry"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:columnCount="2"
-            android:rowCount="4"
-            app:layout_constraintTop_toBottomOf="@id/key_stats_title"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:text="Retry"
+            app:backgroundTint="@color/warm_primary"
+            app:cornerRadius="8dp" />
+    </LinearLayout>
 
-            <!-- Open -->
-            <TextView android:text="Open" style="@style/KeyStatLabel"/>
-            <TextView android:id="@+id/stat_open" tools:text="$177.20" style="@style/KeyStatValue"/>
-
-            <!-- High -->
-            <TextView android:text="High" style="@style/KeyStatLabel"/>
-            <TextView android:id="@+id/stat_high" tools:text="$178.49" style="@style/KeyStatValue"/>
-
-            <!-- Low -->
-            <TextView android:text="Low" style="@style/KeyStatLabel"/>
-            <TextView android:id="@+id/stat_low" tools:text="$175.11" style="@style/KeyStatValue"/>
-
-            <!-- Prev. Close -->
-            <TextView android:text="Prev. Close" style="@style/KeyStatLabel"/>
-            <TextView android:id="@+id/stat_prev_close" tools:text="$177.95" style="@style/KeyStatValue"/>
-
-            <!-- Market Cap -->
-            <TextView android:text="Market Cap" style="@style/KeyStatLabel"/>
-            <TextView android:id="@+id/stat_market_cap" tools:text="$2.75T" style="@style/KeyStatValue"/>
-
-            <!-- Volume -->
-            <TextView android:text="Volume" style="@style/KeyStatLabel"/>
-            <TextView android:id="@+id/stat_volume" tools:text="58.6M" style="@style/KeyStatValue"/>
-
-            <!-- P/E Ratio -->
-            <TextView android:text="P/E Ratio" style="@style/KeyStatLabel"/>
-            <TextView android:id="@+id/stat_pe_ratio" tools:text="29.8x" style="@style/KeyStatValue"/>
-
-            <!-- Shares Outstanding -->
-            <TextView android:text="Shares Outstanding" style="@style/KeyStatLabel"/>
-            <TextView android:id="@+id/stat_shares_outstanding" tools:text="15.5B" style="@style/KeyStatValue"/>
-
-        </GridLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

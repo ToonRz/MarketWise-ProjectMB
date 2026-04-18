@@ -4,23 +4,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.marketwiseproject.databinding.FragmentDashboardBinding
-import java.util.Locale
-import kotlinx.coroutines.launch
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
-import android.view.animation.DecelerateInterpolator
-import androidx.lifecycle.lifecycleScope
+import com.example.marketwiseproject.R
 import com.example.marketwiseproject.data.db.AppDatabase
 import com.example.marketwiseproject.data.db.WatchlistEntity
+import com.example.marketwiseproject.data.models.CryptoPrice
+import com.example.marketwiseproject.databinding.FragmentDashboardBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.NumberFormat
+import java.util.Locale
 import android.widget.Toast
 
 class DashboardFragment : Fragment() {
@@ -30,6 +32,7 @@ class DashboardFragment : Fragment() {
 
     private val viewModel: DashboardViewModel by viewModels()
     private lateinit var watchlistAdapter: WatchlistAdapter
+    private val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,18 +50,7 @@ class DashboardFragment : Fragment() {
         setupObservers()
         setupSwipeRefresh()
 
-        binding.fabAdd.setOnClickListener { view ->
-            // Scale Animation for Gimmick
-            val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
-                view,
-                PropertyValuesHolder.ofFloat("scaleX", 0.9f),
-                PropertyValuesHolder.ofFloat("scaleY", 0.9f)
-            )
-            scaleDown.duration = 100
-            scaleDown.repeatCount = 1
-            scaleDown.repeatMode = ObjectAnimator.REVERSE
-            scaleDown.start()
-
+        binding.addToWatchlistBtn.setOnClickListener {
             // Open BottomSheet
             val bottomSheet = AddWatchlistBottomSheet { coinId, symbol, name ->
                 addCoinToDatabase(symbol, name)
@@ -84,7 +76,7 @@ class DashboardFragment : Fragment() {
         watchlistAdapter = WatchlistAdapter { crypto ->
             val symbolStream = "${crypto.symbol.lowercase(Locale.US)}usdt"
             findNavController().navigate(
-                com.example.marketwiseproject.R.id.navigation_crypto,
+                R.id.navigation_crypto_detail,
                 bundleOf(
                     "symbol" to symbolStream,
                     "coinId" to crypto.id
@@ -102,27 +94,59 @@ class DashboardFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.watchlistPrices.collect { prices ->
                 watchlistAdapter.submitList(prices)
+                // Update Quick Pulse with first 3 items
+                updateQuickPulse(prices.take(3))
             }
         }
 
-        viewModel.fearGreedIndex.observe(viewLifecycleOwner) { index ->
-            binding.fearGreedValue.text = when {
-                index < 25 -> "$index - Extreme Fear"
-                index < 45 -> "$index - Fear"
-                index < 55 -> "$index - Neutral"
-                index < 75 -> "$index - Greed"
-                else -> "$index - Extreme Greed"
-            }
-
-            // Gimmick: Animate Progress Bar exactly to the value
-            val progressAnimator = ObjectAnimator.ofInt(binding.fearGreedProgress, "progress", 0, index)
-            progressAnimator.duration = 1500 // 1.5 seconds animation
-            progressAnimator.interpolator = DecelerateInterpolator()
-            progressAnimator.start()
-        }
+        // Fear & Greed index is removed in minimal layout, so we no longer observe it here
+        // or we could add it back later if requested.
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefresh.isRefreshing = isLoading
+        }
+    }
+
+    private fun updateQuickPulse(cryptos: List<CryptoPrice>) {
+        val container = binding.quickPulseContainer
+        container.removeAllViews()
+
+        for (crypto in cryptos) {
+            val cardView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.widget_quick_pulse, container, false)
+
+            // Set layout params with margin
+            val params = LinearLayout.LayoutParams(
+                resources.getDimensionPixelSize(R.dimen.quick_pulse_card_width),
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.marginEnd = resources.getDimensionPixelSize(R.dimen.quick_pulse_card_margin)
+            cardView.layoutParams = params
+
+            // Set real data
+            cardView.findViewById<TextView>(R.id.widget_symbol).text = "${crypto.symbol}/USDT"
+            cardView.findViewById<TextView>(R.id.widget_price).text = currencyFormat.format(crypto.price)
+
+            val isPositive = crypto.changePercent24h >= 0
+            val changeText = String.format(
+                "%s%.2f%%",
+                if (isPositive) "+" else "",
+                crypto.changePercent24h
+            )
+            val changeTv = cardView.findViewById<TextView>(R.id.widget_change)
+            changeTv.text = changeText
+            changeTv.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    if (isPositive) R.color.positive_muted else R.color.negative_muted
+                )
+            )
+
+            val cal = java.util.Calendar.getInstance()
+            val timeStr = String.format("%02d:%02d", cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE))
+            cardView.findViewById<TextView>(R.id.widget_update_time).text = "Updated: $timeStr"
+
+            container.addView(cardView)
         }
     }
 

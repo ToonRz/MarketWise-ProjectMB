@@ -9,8 +9,15 @@
         android:name="com.example.marketwiseproject.ui.dashboard.DashboardFragment"
         android:label="Dashboard" />
 
+    <!-- Crypto List (Tab destination) -->
     <fragment
         android:id="@+id/navigation_crypto"
+        android:name="com.example.marketwiseproject.ui.crypto.CryptoListFragment"
+        android:label="Crypto" />
+
+    <!-- Crypto Detail (navigated from list) -->
+    <fragment
+        android:id="@+id/navigation_crypto_detail"
         android:name="com.example.marketwiseproject.ui.crypto.CryptoDetailFragment"
         android:label="Crypto Detail">
         <argument
@@ -23,9 +30,21 @@
             android:defaultValue="bitcoin" />
     </fragment>
 
+    <!-- Stock List (Tab destination) -->
     <fragment
         android:id="@+id/navigation_stocks"
-        android:name="com.example.marketwiseproject.ui.dashboard.DashboardFragment"
+        android:name="com.example.marketwiseproject.ui.stock.StockListFragment"
         android:label="Stocks" />
+
+    <!-- Stock Detail (navigated from list) -->
+    <fragment
+        android:id="@+id/navigation_stock_detail"
+        android:name="com.example.marketwiseproject.ui.stock.StockDetailFragment"
+        android:label="Stock Detail">
+        <argument
+            android:name="symbol"
+            app:argType="string"
+            android:defaultValue="AAPL" />
+    </fragment>
 
 </navigation>

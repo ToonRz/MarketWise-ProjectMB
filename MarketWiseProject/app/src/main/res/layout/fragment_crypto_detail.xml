@@ -1,234 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/deep_black">
+    android:background="@color/warm_bg">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp">
 
-        <!-- Price Header Card -->
-        <com.google.android.material.card.MaterialCardView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/card_dark"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp">
+            android:padding="20dp">
 
-            <LinearLayout
+            <!-- Back & More (Handled by Activity Toolbar usually, but we have a custom header here) -->
+            
+            <ImageView
+                android:id="@+id/crypto_logo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@android:drawable/ic_dialog_info" />
+
+            <TextView
+                android:id="@+id/crypto_symbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textColor="@color/warm_text"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/crypto_logo"
+                app:layout_constraintTop_toTopOf="@id/crypto_logo"
+                tools:text="BTC" />
+
+            <TextView
+                android:id="@+id/crypto_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_gray_warm"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@id/crypto_symbol"
+                app:layout_constraintTop_toBottomOf="@id/crypto_symbol"
+                tools:text="Bitcoin" />
+
+            <!-- Price & Change -->
+            <TextView
+                android:id="@+id/crypto_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:textColor="@color/warm_text"
+                android:textSize="36sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/crypto_logo"
+                tools:text="$65,240.50" />
+
+            <TextView
+                android:id="@+id/crypto_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/crypto_price"
+                tools:text="+$1,240.50 (2.45%)"
+                tools:textColor="@color/positive_muted" />
+
+            <!-- Chart Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chart_card"
+                android:layout_width="0dp"
+                android:layout_height="280dp"
+                android:layout_marginTop="24dp"
+                app:cardBackgroundColor="@color/warm_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/crypto_change">
+
+                <com.github.mikephil.charting.charts.LineChart
+                    android:id="@+id/price_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="12dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Signals / Indicators -->
+            <TextView
+                android:id="@+id/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Market Statistics"
+                android:textColor="@color/warm_text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/chart_card" />
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="@color/warm_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintTop_toBottomOf="@id/stats_title">
 
-                <TextView
-                    android:id="@+id/symbolTitle"
-                    android:layout_width="wrap_content"
+                <GridLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/text_gray"
-                    android:textSize="16sp"
-                    tools:text="BTC/USDT" />
+                    android:padding="12dp"
+                    android:columnCount="2">
 
-                <TextView
-                    android:id="@+id/currentPrice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textColor="@color/text_white"
-                    android:textSize="36sp"
-                    android:textStyle="bold"
-                    tools:text="$43,250.50" />
+                    <TextView android:text="Market Cap" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_market_cap" style="@style/KeyStatValue" tools:text="$1.2T" />
 
-                <TextView
-                    android:id="@+id/priceChange"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    tools:text="+$1,234.56 (+2.94%)" />
+                    <TextView android:text="Volume (24h)" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_volume" style="@style/KeyStatValue" tools:text="$35.4B" />
 
-            </LinearLayout>
+                    <TextView android:text="High (24h)" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_high" style="@style/KeyStatValue" tools:text="$66,102.00" />
 
-        </com.google.android.material.card.MaterialCardView>
+                    <TextView android:text="Low (24h)" style="@style/KeyStatLabel" />
+                    <TextView android:id="@+id/stat_low" style="@style/KeyStatValue" tools:text="$64,800.00" />
 
-        <!-- Chart Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="@color/card_dark"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp">
+                </GridLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <com.github.mikephil.charting.charts.LineChart
-                android:id="@+id/priceChart"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="8dp" />
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Technical Indicators Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="@color/card_dark"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="8dp">
-
-            <LinearLayout
+            <!-- Analysis Signal -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/signal_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginTop="24dp"
+                app:cardBackgroundColor="#FDF1E6"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:layout_constraintTop_toBottomOf="@id/stats_title"
+                android:visibility="gone">
+                <!-- Will be shown below stats title or via specific navigation -->
+            </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="📊 Technical Indicators"
-                    android:textColor="@color/text_white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
-                <!-- RSI -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="RSI (14)"
-                        android:textColor="@color/text_gray" />
-
-                    <TextView
-                        android:id="@+id/rsiValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_white"
-                        android:textStyle="bold"
-                        tools:text="68.5" />
-
-                    <TextView
-                        android:id="@+id/rsiSignal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textStyle="bold"
-                        tools:text="NEUTRAL" />
-
-                </LinearLayout>
-
-                <!-- MACD -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="MACD"
-                        android:textColor="@color/text_gray" />
-
-                    <TextView
-                        android:id="@+id/macdValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_white"
-                        android:textStyle="bold"
-                        tools:text="125.4" />
-
-                    <TextView
-                        android:id="@+id/macdSignal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:textStyle="bold"
-                        tools:text="BUY" />
-
-                </LinearLayout>
-
-                <!-- Moving Average -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="MA (50/200)"
-                        android:textColor="@color/text_gray" />
-
-                    <TextView
-                        android:id="@+id/maValue"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/text_white"
-                        android:textStyle="bold"
-                        tools:text="$42,100 / $38,500" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Signal Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/signalCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:cardBackgroundColor="@color/neon_green"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:padding="24dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🚀 SIGNAL STATUS"
-                    android:textColor="@color/deep_black"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/signalText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="STRONG BUY"
-                    android:textColor="@color/deep_black"
-                    android:textSize="28sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-    </LinearLayout>
-
-</ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
