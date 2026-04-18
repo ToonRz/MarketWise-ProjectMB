@@ -123,19 +123,9 @@ FINNHUB_API_KEY=your_finnhub_api_key
 - มี unit test สำหรับ repository หลัก
 - รองรับการทำงานต่อเนื่องผ่าน WorkManager และ Widget
 
-## แนวทางพัฒนาต่อ (Roadmap Suggestion)
-
-- เพิ่มระบบ Sign-in / Sync watchlist ข้ามอุปกรณ์
-- เพิ่มการตั้งแจ้งเตือนแบบ %change และ trailing alert
-- รองรับ dark mode แบบปรับธีมอัตโนมัติ
-- เพิ่ม analytics screen เช่น P/L summary และ sector allocation
 
 ## Troubleshooting
 
 - ถ้าไม่ใส่ `FINNHUB_API_KEY` ฟีเจอร์หุ้นอาจโหลดไม่สำเร็จ
 - ถ้า widget ไม่อัปเดต ให้ตรวจสอบ battery optimization ของเครื่อง
 - ถ้า notification ไม่ขึ้น ให้ตรวจสอบสิทธิ์ `POST_NOTIFICATIONS` (Android 13+)
-
-## License
-
-ยังไม่มีการกำหนด License อย่างเป็นทางการใน repository นี้
