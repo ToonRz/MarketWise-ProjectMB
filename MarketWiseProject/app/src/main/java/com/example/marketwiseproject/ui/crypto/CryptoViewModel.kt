@@ -61,17 +61,24 @@ class CryptoViewModel : ViewModel() {
 
     fun loadCryptoData(coinId: String) {
         viewModelScope.launch {
+            // 1. Fetch current market statistics (Market Cap, Volume, etc.)
+            launch {
+                try {
+                    val details = repository.getCoinDetails(coinId)
+                    details?.let {
+                        _cryptoData.postValue(it)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            // 2. Fetch historical prices for the chart
             try {
-                // Load historical prices from API (returns List<List<Double>>)
                 val priceData = repository.getHistoricalPrices(coinId, days = 30)
-
-                // Extract only prices (index 1) from [[timestamp, price], ...]
-                val prices = priceData.map { it[1] }  // ✅ ตรงนี้สำคัญ!
-
-                // Update LiveData
+                val prices = priceData.map { it[1] }
                 _historicalPrices.value = prices
 
-                // Calculate technical indicators only if we have data
                 if (prices.isNotEmpty()) {
                     val rsi = TechnicalAnalysis.calculateRSI(prices)
                     val (macd, macdSignal, _) = TechnicalAnalysis.calculateMACD(prices)
@@ -105,6 +112,7 @@ class CryptoViewModel : ViewModel() {
             }
         }
     }
+
 
     override fun onCleared() {
         super.onCleared()

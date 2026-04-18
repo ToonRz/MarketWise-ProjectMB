@@ -10,6 +10,10 @@ import kotlin.random.Random
 
 class StockRepository(private val finnhubApi: FinnhubApi) {
 
+    /**
+     * Fetches detailed stock data.
+     * Throws or returns [Result.failure] on network errors to satisfy Unit Tests.
+     */
     suspend fun getStockDetails(symbol: String): Result<StockDetails> {
         return withContext(Dispatchers.IO) {
             try {
@@ -19,22 +23,23 @@ class StockRepository(private val finnhubApi: FinnhubApi) {
                 calendar.add(Calendar.YEAR, -1)
                 val from = calendar.timeInMillis / 1000
 
-                // 2. Fetch all data sequentially 
-                // In free tier, we might hit rate limits or some endpoints might return 403
-                val quote = try { finnhubApi.getQuote(symbol) } catch (e: Exception) { null }
-                val profile = try { finnhubApi.getProfile(symbol) } catch (e: Exception) { null }
+                // 2. Fetch data
+                // Mandatory calls (Exceptions here will result in Result.failure)
+                val quote = finnhubApi.getQuote(symbol)
+                val profile = finnhubApi.getProfile(symbol)
+
+                // Optional calls (Errors here result in nulls, but success for the whole request)
                 val candles = try { finnhubApi.getStockCandles(symbol, "D", from, to) } catch (e: Exception) { null }
                 val financials = try { finnhubApi.getBasicFinancials(symbol) } catch (e: Exception) { null }
 
-                // 3. Fallback to Mock if crucial data (quote/profile) is missing
-                if (quote?.currentPrice == null || profile?.ticker == null) {
-                    return@withContext Result.success(generateMockStockDetails(symbol))
+                // 3. Extract logic precisely
+                val peValue = financials?.metric?.get("peNormalizedAnnual")
+                val peRatio = when (peValue) {
+                    is Double -> peValue
+                    is Number -> peValue.toDouble()
+                    else -> null
                 }
 
-                // 4. Extract P/E ratio
-                val peRatio = (financials?.metric?.get("peNormalizedAnnual")) as? Double
-
-                // 5. Combine into a single model
                 val stockDetails = StockDetails(
                     symbol = profile.ticker ?: symbol,
                     name = profile.name ?: "N/A",
@@ -52,11 +57,11 @@ class StockRepository(private val finnhubApi: FinnhubApi) {
                     volume = candles?.volumes?.lastOrNull(),
                     candles = candles ?: createMockCandles()
                 )
+                
                 Result.success(stockDetails)
             } catch (e: Exception) {
-                e.printStackTrace()
-                // Ultimate fallback for any error
-                Result.success(generateMockStockDetails(symbol))
+                // Propagate exception as Failure to satisfy Unit Tests
+                Result.failure(e)
             }
         }
     }
