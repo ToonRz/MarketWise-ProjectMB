@@ -7,13 +7,15 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [WatchlistEntity::class],
-    version = 1,
+    entities = [WatchlistEntity::class, PriceAlertEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun watchlistDao(): WatchlistDao
+    abstract fun priceAlertDao(): PriceAlertDao
+
 
     companion object {
         @Volatile
@@ -25,7 +27,10 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "marketwise_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration(true)
+                    .build()
+
                 INSTANCE = instance
                 instance
             }

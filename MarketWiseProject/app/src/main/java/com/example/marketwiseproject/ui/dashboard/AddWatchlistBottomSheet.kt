@@ -13,23 +13,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.marketwiseproject.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, String) -> Unit) : BottomSheetDialogFragment() {
+class AddWatchlistBottomSheet(private val onAssetSelected: (String, String, String, String) -> Unit) : BottomSheetDialogFragment() {
 
     // Simple mock data for presentation
-    private val availableCoins = listOf(
-        Pair("bitcoin", "BTC - Bitcoin"),
-        Pair("ethereum", "ETH - Ethereum"),
-        Pair("binancecoin", "BNB - Binance Coin"),
-        Pair("solana", "SOL - Solana"),
-        Pair("cardano", "ADA - Cardano"),
-        Pair("ripple", "XRP - Ripple"),
-        Pair("dogecoin", "DOGE - Dogecoin"),
-        Pair("polkadot", "DOT - Polkadot"),
-        Pair("matic-network", "MATIC - Polygon")
+    private val availableAssets = listOf(
+        // Crypto
+        Triple("bitcoin", "BTC", "Bitcoin"),
+        Triple("ethereum", "ETH", "Ethereum"),
+        Triple("binancecoin", "BNB", "Binance Coin"),
+        Triple("solana", "SOL", "Solana"),
+        Triple("cardano", "ADA", "Cardano"),
+        // Stocks
+        Triple("AAPL", "AAPL", "Apple Inc."),
+        Triple("TSLA", "TSLA", "Tesla, Inc."),
+        Triple("GOOGL", "GOOGL", "Alphabet Inc."),
+        Triple("MSFT", "MSFT", "Microsoft Corp."),
+        Triple("AMZN", "AMZN", "Amazon.com, Inc."),
+        Triple("META", "META", "Meta Platforms")
     )
 
     private lateinit var searchAdapter: SearchAdapter
-    private var filteredCoins = availableCoins.toList()
+    private var filteredAssets = availableAssets.toList()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,8 +49,9 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, Strin
         val recyclerView = view.findViewById<RecyclerView>(R.id.search_results_rv)
         val searchInput = view.findViewById<EditText>(R.id.search_edit_text)
 
-        searchAdapter = SearchAdapter(filteredCoins) { coinId, symbol, name ->
-            onCoinSelected(coinId, symbol, name)
+        searchAdapter = SearchAdapter(filteredAssets) { id, symbol, name ->
+            val type = if (id.first().isLowerCase()) "CRYPTO" else "STOCK"
+            onAssetSelected(id, symbol, name, type)
             dismiss()
         }
 
@@ -58,19 +64,22 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, Strin
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val query = s?.toString()?.lowercase() ?: ""
-                filteredCoins = if (query.isEmpty()) {
-                    availableCoins
+                filteredAssets = if (query.isEmpty()) {
+                    availableAssets
                 } else {
-                    availableCoins.filter { it.second.lowercase().contains(query) }
+                    availableAssets.filter { 
+                        it.second.lowercase().contains(query) || it.third.lowercase().contains(query) 
+                    }
                 }
-                searchAdapter.updateData(filteredCoins)
+                searchAdapter.updateData(filteredAssets)
             }
             override fun afterTextChanged(s: Editable?) {}
         })
+
     }
 
     private inner class SearchAdapter(
-        private var items: List<Pair<String, String>>,
+        private var items: List<Triple<String, String, String>>,
         private val onItemClick: (String, String, String) -> Unit
     ) : RecyclerView.Adapter<SearchAdapter.ViewHolder>() {
 
@@ -83,8 +92,7 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, Strin
                     val position = bindingAdapterPosition
                     if (position != RecyclerView.NO_POSITION) {
                         val item = items[position]
-                        val parts = item.second.split(" - ")
-                        onItemClick(item.first, parts[0], parts[1])
+                        onItemClick(item.first, item.second, item.third)
                     }
                 }
             }
@@ -97,16 +105,16 @@ class AddWatchlistBottomSheet(private val onCoinSelected: (String, String, Strin
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = items[position]
-            val parts = item.second.split(" - ")
-            holder.symbolText.text = parts[0]
-            holder.nameText.text = parts[1]
+            holder.symbolText.text = item.second
+            holder.nameText.text = item.third
         }
 
         override fun getItemCount() = items.size
 
-        fun updateData(newItems: List<Pair<String, String>>) {
+        fun updateData(newItems: List<Triple<String, String, String>>) {
             items = newItems
             notifyDataSetChanged()
         }
     }
+
 }

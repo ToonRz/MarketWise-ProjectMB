@@ -21,13 +21,13 @@ class CryptoRepository(
                     id = market.id,
                     symbol = market.symbol.uppercase(),
                     name = market.name,
-                    price = market.current_price,
-                    change24h = market.price_change_24h,
-                    changePercent24h = market.price_change_percentage_24h,
-                    high24h = market.high_24h,
-                    low24h = market.low_24h,
-                    volume24h = market.total_volume,
-                    marketCap = market.market_cap,
+                    price = market.current_price ?: 0.0,
+                    change24h = market.price_change_24h ?: 0.0,
+                    changePercent24h = market.price_change_percentage_24h ?: 0.0,
+                    high24h = market.high_24h ?: 0.0,
+                    low24h = market.low_24h ?: 0.0,
+                    volume24h = market.total_volume ?: 0.0,
+                    marketCap = market.market_cap ?: 0.0,
                     image = market.image
                 )
             }
@@ -47,13 +47,13 @@ class CryptoRepository(
                     id = market.id,
                     symbol = market.symbol.uppercase(),
                     name = market.name,
-                    price = market.current_price,
-                    change24h = market.price_change_24h,
-                    changePercent24h = market.price_change_percentage_24h,
-                    high24h = market.high_24h,
-                    low24h = market.low_24h,
-                    volume24h = market.total_volume,
-                    marketCap = market.market_cap,
+                    price = market.current_price ?: 0.0,
+                    change24h = market.price_change_24h ?: 0.0,
+                    changePercent24h = market.price_change_percentage_24h ?: 0.0,
+                    high24h = market.high_24h ?: 0.0,
+                    low24h = market.low_24h ?: 0.0,
+                    volume24h = market.total_volume ?: 0.0,
+                    marketCap = market.market_cap ?: 0.0,
                     image = market.image
                 )
             }

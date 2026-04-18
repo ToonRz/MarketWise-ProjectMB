@@ -20,6 +20,15 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import java.text.NumberFormat
 import java.util.Locale
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import com.example.marketwiseproject.data.db.AppDatabase
+import com.example.marketwiseproject.data.db.PriceAlertEntity
+import com.example.marketwiseproject.ui.crypto.PriceAlertBottomSheet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 class StockDetailFragment : Fragment() {
 
@@ -55,7 +64,33 @@ class StockDetailFragment : Fragment() {
         }
 
         viewModel.fetchStockDetails(symbol)
+
+        binding.btnPriceAlert.setOnClickListener {
+            val currentPrice = (viewModel.stockDetailState.value as? StockDetailState.Success)?.data?.currentPrice ?: 0.0
+            val bottomSheet = PriceAlertBottomSheet(symbol, currentPrice) { targetPrice, isAbove ->
+                setupPriceAlert(symbol, targetPrice, isAbove)
+            }
+            bottomSheet.show(parentFragmentManager, "PriceAlertBottomSheet")
+        }
     }
+
+    private fun setupPriceAlert(symbol: String, target: Double, isAbove: Boolean) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(requireContext())
+            db.priceAlertDao().insertAlert(
+                PriceAlertEntity(
+                    symbol = symbol,
+                    name = symbol,
+                    targetPrice = target,
+                    isAbove = isAbove
+                )
+            )
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "Alert set for $symbol at $$target", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 
     private fun observeViewModel() {
         viewModel.stockDetailState.observe(viewLifecycleOwner) { state ->

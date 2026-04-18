@@ -110,9 +110,11 @@
                 app:layout_constraintTop_toBottomOf="@id/chart_card" />
 
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/stats_card_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+
                 app:cardBackgroundColor="@color/warm_surface"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
@@ -139,19 +141,79 @@
                 </GridLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Analysis Signal -->
+            <!-- Header Action Buttons -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_price_alert"
+                style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:icon="@drawable/ic_notification"
+                app:iconSize="24dp"
+                app:iconTint="@color/warm_primary"
+                android:padding="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/crypto_logo"
+                app:layout_constraintBottom_toBottomOf="@id/crypto_logo" />
+
+            <!-- Technical Analysis Title (Restored) -->
+            <TextView
+                android:id="@+id/analysis_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Technical Indicators"
+                android:textColor="@color/warm_text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/stats_card_container" />
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/signal_card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 app:cardBackgroundColor="#FDF1E6"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:layout_constraintTop_toBottomOf="@id/stats_title"
-                android:visibility="gone">
-                <!-- Will be shown below stats title or via specific navigation -->
+                app:layout_constraintTop_toBottomOf="@id/analysis_title">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/signal_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/warm_text"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="Overall Signal: STRONG BUY" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="#E9E5D9" />
+
+                    <GridLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="2"
+                        android:rowCount="2">
+
+                        <TextView android:text="RSI (14)" style="@style/KeyStatLabel" />
+                        <TextView android:id="@+id/rsi_value" style="@style/KeyStatValue" tools:text="65.4" />
+
+                        <TextView android:text="MACD" style="@style/KeyStatLabel" />
+                        <TextView android:id="@+id/macd_value" style="@style/KeyStatValue" tools:text="Bullish" />
+                    </GridLayout>
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

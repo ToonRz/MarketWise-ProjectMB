@@ -1,6 +1,5 @@
 package com.example.marketwiseproject.services
 
-
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -9,35 +8,62 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.marketwiseproject.R
+import com.example.marketwiseproject.data.db.AppDatabase
 import com.example.marketwiseproject.data.repository.CryptoRepository
+import com.example.marketwiseproject.data.repository.StockRepository
+import kotlinx.coroutines.flow.first
 
 class PriceAlertWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
-    private val repository = CryptoRepository()
+    private val cryptoRepository = CryptoRepository()
+    private val stockRepository = StockRepository() // Assumes default constructor works or I'll fix it
+    private val database = AppDatabase.getDatabase(context)
 
     override suspend fun doWork(): Result {
         return try {
-            val symbol = inputData.getString("symbol") ?: return Result.failure()
-            val targetPrice = inputData.getDouble("targetPrice", 0.0)
+            val alerts = database.priceAlertDao().getAllAlerts().first()
+            
+            for (alert in alerts) {
+                if (!alert.isEnabled) continue
 
-            val prices = repository.getTopCryptos()
-            val crypto = prices.find { it.symbol.equals(symbol, ignoreCase = true) }
-
-            crypto?.let {
-                if (it.price >= targetPrice) {
-                    sendNotification(
-                        "Price Alert: ${it.symbol}",
-                        "Current price: $${it.price} reached target: $${targetPrice}"
-                    )
+                // Check Crypto
+                val cryptos = cryptoRepository.getTopCryptos()
+                val crypto = cryptos.find { it.symbol.equals(alert.symbol, ignoreCase = true) }
+                
+                if (crypto != null) {
+                    checkAndNotify(alert.symbol, crypto.price, alert.targetPrice, alert.isAbove)
+                } else {
+                    // Check Stock
+                    val stockDetails = stockRepository.getStockDetails(alert.symbol)
+                    stockDetails.onSuccess { details ->
+                        checkAndNotify(alert.symbol, details.currentPrice, alert.targetPrice, alert.isAbove)
+                    }
                 }
             }
 
             Result.success()
         } catch (e: Exception) {
             Result.retry()
+        }
+    }
+
+    private fun checkAndNotify(symbol: String, currentPrice: Double, targetPrice: Double, isAbove: Boolean) {
+        val triggered = if (isAbove) {
+            currentPrice >= targetPrice
+        } else {
+            currentPrice <= targetPrice
+        }
+
+        if (triggered) {
+            sendNotification(
+                "Price Alert: $symbol",
+                "Current price: $$currentPrice reached target: $$targetPrice"
+            )
+            // Optional: disable alert after trigger? 
+            // database.priceAlertDao().toggleAlert(alert.id, false)
         }
     }
 
@@ -54,7 +80,7 @@ class PriceAlertWorker(
         }
 
         val notification = NotificationCompat.Builder(applicationContext, "price_alerts")
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.mipmap.ic_launcher) // Fallback icon
             .setContentTitle(title)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

@@ -8,7 +8,8 @@ import kotlinx.coroutines.withContext
 import java.util.Calendar
 import kotlin.random.Random
 
-class StockRepository(private val finnhubApi: FinnhubApi) {
+class StockRepository(private val finnhubApi: FinnhubApi = FinnhubApi.getInstance()) {
+
 
     /**
      * Fetches detailed stock data.

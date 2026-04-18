@@ -52,37 +52,50 @@ class DashboardFragment : Fragment() {
 
         binding.addToWatchlistBtn.setOnClickListener {
             // Open BottomSheet
-            val bottomSheet = AddWatchlistBottomSheet { coinId, symbol, name ->
-                addCoinToDatabase(symbol, name)
+            val bottomSheet = AddWatchlistBottomSheet { id, symbol, name, type ->
+                addAssetToDatabase(id, symbol, name, type)
             }
             bottomSheet.show(parentFragmentManager, "AddWatchlistBottomSheet")
         }
     }
 
-    private fun addCoinToDatabase(symbol: String, name: String) {
+    private fun addAssetToDatabase(id: String, symbol: String, name: String, type: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val dao = AppDatabase.getDatabase(requireContext()).watchlistDao()
-            dao.insert(WatchlistEntity(symbol = symbol, name = name, type = "CRYPTO", addedAt = System.currentTimeMillis()))
+            dao.insert(WatchlistEntity(
+                symbol = symbol, 
+                name = name, 
+                type = type, 
+                addedAt = System.currentTimeMillis()
+            ))
+
             
             withContext(Dispatchers.Main) {
                 Toast.makeText(requireContext(), "$symbol added to Watchlist!", Toast.LENGTH_SHORT).show()
-                // Refresh data
-                viewModel.loadWatchlistPrices()
+                // data refresh will be triggered automatically by the Flow observer in DashboardViewModel
             }
         }
     }
 
     private fun setupRecyclerView() {
-        watchlistAdapter = WatchlistAdapter { crypto ->
-            val symbolStream = "${crypto.symbol.lowercase(Locale.US)}usdt"
-            findNavController().navigate(
-                R.id.navigation_crypto_detail,
-                bundleOf(
-                    "symbol" to symbolStream,
-                    "coinId" to crypto.id
+        watchlistAdapter = WatchlistAdapter { asset ->
+            if (asset.type == "STOCK") {
+                findNavController().navigate(
+                    R.id.navigation_stock_detail,
+                    bundleOf("symbol" to asset.symbol)
                 )
-            )
+            } else {
+                val symbolStream = "${asset.symbol.lowercase(Locale.US)}usdt"
+                findNavController().navigate(
+                    R.id.navigation_crypto_detail,
+                    bundleOf(
+                        "symbol" to symbolStream,
+                        "coinId" to asset.id
+                    )
+                )
+            }
         }
+
 
         binding.watchlistRecyclerView.apply {
             layoutManager = LinearLayoutManager(context)
@@ -99,8 +112,27 @@ class DashboardFragment : Fragment() {
             }
         }
 
-        // Fear & Greed index is removed in minimal layout, so we no longer observe it here
-        // or we could add it back later if requested.
+        viewModel.fearGreedIndex.observe(viewLifecycleOwner) { value ->
+            binding.fgValue.text = value.toString()
+            
+            val (label, colorRes) = when {
+                value >= 75 -> "Extreme Greed" to R.color.positive_muted
+                value >= 55 -> "Greed" to R.color.positive_muted
+                value >= 45 -> "Neutral" to R.color.text_gray_warm
+                value >= 25 -> "Fear" to R.color.negative_muted
+                else -> "Extreme Fear" to R.color.negative_muted
+            }
+            
+            binding.fgLabel.text = label
+            binding.fgLabel.setTextColor(ContextCompat.getColor(requireContext(), colorRes))
+            
+            // Update gauge
+            val params = binding.fgGaugeFill.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+            params.matchConstraintPercentWidth = value / 100f
+            binding.fgGaugeFill.layoutParams = params
+            binding.fgGaugeFill.setBackgroundColor(ContextCompat.getColor(requireContext(), colorRes))
+        }
+
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.swipeRefresh.isRefreshing = isLoading
